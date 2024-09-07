@@ -1,3 +1,16 @@
+/*
+    A collection of elements stored at contiguous memory locations, accessible by index.
+
+    Time Complexity:
+
+    Access: O(1)
+    Insertion/Deletion (at end): O(1)
+    Insertion/Deletion (at arbitrary position): O(n)
+
+ */
+
+console.log('----- Array -----');    
+
 // Define an array of numbers
 let numbers: number[] = [1, 2, 3, 4, 5];
 

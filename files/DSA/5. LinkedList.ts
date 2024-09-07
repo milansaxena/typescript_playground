@@ -1,3 +1,16 @@
+/*
+    Linear Search
+
+    Linear search is a simple search algorithm that checks each element of the list 
+    sequentially until the target element is found or the list ends.
+
+    It iterates through each element in the array and compares it with the target. 
+    It has a time complexity of O(n), where n is the number of elements in the array.
+
+ */
+
+console.log('----- LinkedList -----');
+
 class Node<T> {
     value: T;
     next: Node<T> | null = null;

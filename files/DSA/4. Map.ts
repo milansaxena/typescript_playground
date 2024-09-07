@@ -1,3 +1,14 @@
+/*
+    A collection of key-value pairs where keys are unique and support efficient retrieval, insertion, and deletion.
+    
+    Time Complexity:
+
+    Insertion/Deletion/Lookup: O(1) on average (assuming good hash function, though can be O(n) in worst-case scenarios).
+
+ */
+    
+console.log('----- Map -----');
+
 // Create a map
 let ages: Map<string, number> = new Map();
 
