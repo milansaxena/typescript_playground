@@ -1,43 +1,71 @@
-const apiBaseUrl = 'http://localhost:3000/api';
+const apiBaseUrl = 'http://localhost:3000/api'; // Adjust this to your server's URL
 
-// Define TypeScript files
-const tsFiles = [
-    {
-        name: 'hello.ts',
-        content: `function helloWorld() {
-            console.log("Hello, TypeScript!");
-        }
+// Theme toggle function
+function toggleTheme() {
+    const body = document.body;
+    body.classList.toggle('dark-theme');
+    body.classList.toggle('light-theme');
+}
 
-        helloWorld();`
-    }
-];
-
-// Initialize Monaco Editor
+// Load Monaco Editor
 require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs' }});
 require(['vs/editor/editor.main'], function () {
-    window.editor = monaco.editor.create(document.getElementById('editor-container'), {
-        value: tsFiles[0].content, // Load the first file by default
-        language: 'typescript',
-        theme: 'vs-dark',
-        automaticLayout: true
+    // Define custom themes for Monaco Editor
+    monaco.editor.defineTheme('custom-dark', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [],
+        colors: {
+            'editor.background': '#1E1E1E',
+            'editor.foreground': '#FFFFFF'
+        }
     });
+    monaco.editor.defineTheme('custom-light', {
+        base: 'vs',
+        inherit: true,
+        rules: [],
+        colors: {
+            'editor.background': '#F5F5F5',
+            'editor.foreground': '#000000'
+        }
+    });
+
+    // Set default editor theme
+    const editorTheme = document.body.classList.contains('dark-theme') ? 'custom-dark' : 'custom-light';
+    window.editor = monaco.editor.create(document.getElementById('editor'), {
+        value: `function helloWorld() {
+    console.log("Hello, TypeScript!");
+}
+
+helloWorld();`,
+        language: 'typescript',
+        theme: editorTheme
+    });
+
+    // Fetch file list
+    fetchFileList();
 });
 
-// Function to fetch and display the list of TypeScript files dynamically
+// Handle theme switching in Monaco Editor
+document.getElementById('themeSwitch').addEventListener('change', function () {
+    const theme = document.body.classList.contains('dark-theme') ? 'custom-dark' : 'custom-light';
+    monaco.editor.setTheme(theme);
+});
+
+// Fetch and display the list of TypeScript files
 async function fetchFileList() {
     try {
-        const response = await fetch(`${apiBaseUrl}/programs`);
+        const response = await fetch(`${apiBaseUrl}/files`);
         const files = await response.json();
 
-        const fileNamesList = document.getElementById('file-list');
+        const fileNamesList = document.getElementById('file-names');
         fileNamesList.innerHTML = '';  // Clear the list
 
-        // Loop through each file and display it
         files.forEach((fileName) => {
             const li = document.createElement('li');
             li.textContent = fileName;
+            li.classList.add('list-group-item', 'list-group-item-action');
 
-            // On click, load the corresponding file content into the editor
             li.addEventListener('click', function () {
                 loadFileContent(fileName);
             });
@@ -49,10 +77,10 @@ async function fetchFileList() {
     }
 }
 
-// Function to load the content of a clicked file into the Monaco editor
+// Load the content of the selected file
 async function loadFileContent(fileName) {
     try {
-        const response = await fetch(`${apiBaseUrl}/programs/${fileName}`);
+        const response = await fetch(`${apiBaseUrl}/files/${fileName}`);
         const fileData = await response.json();
         window.editor.setValue(fileData.content);  // Set the file content in Monaco editor
     } catch (error) {
@@ -60,7 +88,7 @@ async function loadFileContent(fileName) {
     }
 }
 
-// Function to compile and run TypeScript code
+// Compile and run the TypeScript code
 function runCode() {
     const tsCode = window.editor.getValue();
     let jsCode;
@@ -116,20 +144,18 @@ function runCode() {
     }
 }
 
-// Save the current code from the editor as a new file
+// Save the current code as a new file
 function saveFile() {
-    const tsCode = window.editor.getValue();  // Get the current code from the editor
-    const fileName = prompt('Enter the file name:', 'newFile.ts');  // Ask the user for a file name
-    
-    if (fileName) {
-        const blob = new Blob([tsCode], { type: 'text/plain' });  // Create a Blob with the file content
+    const tsCode = window.editor.getValue();
+    const fileName = prompt('Enter the file name:', 'newFile.ts');
 
-        // Create an anchor element to trigger the download
+    if (fileName) {
+        const blob = new Blob([tsCode], { type: 'text/plain' });
+
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = fileName;  // Set the file name for the download
+        link.download = fileName;
 
-        // Append the link to the body, trigger the click, and remove the link
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -137,5 +163,3 @@ function saveFile() {
 }
 
 
-// Initialize the file list on page load
-window.onload = fetchFileList;

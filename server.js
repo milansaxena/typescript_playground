@@ -6,7 +6,7 @@ const app = express();
 const port = 3000;
 
 // Directory containing TypeScript files
-const filesDir = path.join(__dirname, 'programs');
+const filesDir = path.join(__dirname, 'files');
 
 // CORS setup (allow all origins for testing)
 app.use((req, res, next) => {
@@ -16,7 +16,7 @@ app.use((req, res, next) => {
 });
 
 // API endpoint to get list of TypeScript files
-app.get('/api/programs', (req, res) => {
+app.get('/api/files', (req, res) => {
     fs.readdir(filesDir, (err, files) => {
         if (err) {
             return res.status(500).json({ message: 'Error reading files' });
@@ -28,7 +28,7 @@ app.get('/api/programs', (req, res) => {
 });
 
 // API endpoint to get the content of a specific file
-app.get('/api/programs/:fileName', (req, res) => {
+app.get('/api/files/:fileName', (req, res) => {
     const fileName = req.params.fileName;
     const filePath = path.join(filesDir, fileName);
 
